@@ -1,432 +1,663 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SohbetEdecekDeliBul.com - Deli Arkadaş Bul!</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>SohbetEdecekDeliBul.com</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
         .card-swipe {
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            cursor: grab;
         }
-        .card-swipe.swipe-left {
-            transform: translateX(-150%) rotate(-30deg);
-            opacity: 0;
+        
+        .card-swipe:active {
+            cursor: grabbing;
+            transform: scale(0.98);
         }
+
         .card-swipe.swipe-right {
             transform: translateX(150%) rotate(30deg);
             opacity: 0;
         }
+
+        .card-swipe.swipe-left {
+            transform: translateX(-150%) rotate(-30deg);
+            opacity: 0;
+        }
+
+        .card-swipe:hover {
+            transform: scale(1.02);
+        }
+
+        .message-bubble {
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-radius: 20px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9ca3af;
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
+        }
+
+        .glow {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+            }
+            to {
+                box-shadow: 0 0 35px rgba(168, 85, 247, 0.9);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px); }
+            75% { transform: translateX(15px); }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .gradient-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.5);
+            border-radius: 10px;
+        }
+
+        .message-tail-right {
+            position: relative;
+        }
+
+        .message-tail-right::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            bottom: 8px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid;
+            border-left-color: inherit;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        .message-tail-left {
+            position: relative;
+        }
+
+        .message-tail-left::after {
+            content: '';
+            position: absolute;
+            left: -6px;
+            bottom: 8px;
+            width: 0;
+            height: 0;
+            border-right: 8px solid;
+            border-right-color: inherit;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        .emoji-hover {
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .emoji-hover:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-hover:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 min-h-screen">
-    <div id="root"></div>
+<body>
+    <div id="app"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-
+    <script>
         const deliTipleri = [
-            { tip: "Romantik Deli", emoji: "💕" },
-            { tip: "Felsefi Deli", emoji: "🤔" },
-            { tip: "Esprili Deli", emoji: "😂" },
-            { tip: "Sakin Deli", emoji: "😌" },
-            { tip: "Enerjik Deli", emoji: "⚡" },
-            { tip: "Şarkıcı Deli", emoji: "🎤" },
-            { tip: "Dans Eden Deli", emoji: "💃" },
-            { tip: "Yemek Delisi", emoji: "🍕" },
-            { tip: "Gece Kuşu Deli", emoji: "🦉" },
-            { tip: "Kahve Bağımlısı Deli", emoji: "☕" }
+            '🌹 Romantik Deli', '🧠 Felsefi Deli', '😂 Esprili Deli', '😌 Sakin Deli',
+            '⚡ Aşırı Enerjik Deli', '🌙 Melankolik Deli', '💃 Dans Eden Deli', '📝 Şair Deli',
+            '🔮 Gizemli Deli', '🗺️ Maceraperest Deli', '💻 Teknoloji Delisi', '🎵 Müzik Delisi'
         ];
 
-        const takmaAdlar = [
-            "DeliKralı", "PsikozPrenses", "ÇılgınKaplan", "UçukKedi", 
-            "MistikMaymun", "KaosPandası", "DelirtenDelfin", "SersemSinek",
-            "TuhafTilki", "GaripGoril", "AbsürtArı", "BilinmezBalina",
-            "EfsaneFil", "HayalciHamsi", "İllüzyonİnek", "JokerJaguar"
+        const emojiler = ['🤪', '😜', '🥳', '🤡', '👽', '🦄', '🐸', '🦖', '🌈', '✨', '🎭', '🎪', '🎨', '🎸', '🚀', '🌙'];
+
+        const bioOrnekleri = [
+            'Ben tostla konuşurum! 🍞',
+            'Ay\'a gitmeyi planlıyorum 🚀',
+            'Dünya düz mü yuvarlak mı? 🌍',
+            'Sabah kahvaltısına patates 🥔',
+            'Kedi miyavlaması yapabilirim 🐱',
+            'Duvar kağıdı topluyorum 🖼️',
+            'Gece 3\'te buzdolabıyla sohbet 🌙',
+            'Her gün farklı kişilik 🎭',
+            'Bulutlara isim veriyorum ☁️',
+            'Uzaylı arıyorum 👽'
         ];
 
-        const hakkindaCumleleri = [
-            "Gece 3'te tostla sohbet ederim, sen de gelir misin?",
-            "Hayat bir simulasyon ama ben gerçekten deliyim.",
-            "Kedime felsefe dersi veriyorum, ilgilendin mi?",
-            "Rüyamda makarna yedim, seninle de yesek?",
-            "Duvarla konuşuyorum ama o cevap vermiyor, sen ver.",
-            "Ayakkabılarımla dans ediyorum, partnerlik yapar mısın?",
-            "Süpermarkette opera söylüyorum, korom olur musun?",
-            "Bulutlara isim veriyorum, seninle paylaşırım.",
-            "Gölgemle tartışıyorum, hakem olur musun?",
-            "Zamanda yolculuk yapıyorum ama bilet pahalı, sen ver."
+        const mesajSablonlari = [
+            'Merhaba! Ben de tostla konuşuyorum bazen 🍞',
+            'Vay be! Sen de deli misin? 🤪',
+            'Bugün kaç kere dans ettin? 💃',
+            'Bence hayat bir simülasyon 👾',
+            'Kahvaltıda ne yedin? 😋',
+            'Kedilerin gizli dili var 🐱',
+            'Bulutlar mesaj gönderiyor ☁️',
+            'Gece yarısı sohbetleri en iyi 🌙',
+            'Sen hiç duvarla tartıştın mı? 🧱',
+            'Aya el sallayacağım bu gece 👋',
+            'Rüyalarımla uyanıyorum ☕',
+            'Kuşlara şarkı söylüyorum 🐦',
+            'Dans et hayat kısa! 💃',
+            'Uzay yolculuğuna çıkalım 🚀'
         ];
 
-        const otomatikMesajlar = [
-            "Ben de tostla konuşurum! 🍞",
-            "Senin deli tipin nedir acaba? 🤪",
-            "Bugün bir kedi gördüm, filozoftu sanırım 🐱",
-            "Hava yağmurlu ama ruhum güneşli ☀️",
-            "Makarna felsefesi üzerine tez yazıyorum 🍝",
-            "Kafam karışık ama kalbim net 💗",
-            "Dans edelim mi, yoksa uçalım mı? 💫",
-            "Seni bulut gibi görüyorum, yumuşacık ☁️",
-            "Hayat kısa, deliliği uzat! 🎉",
-            "Seninle konuşmak terapi gibi 🌟",
-            "Bugün duvara merhaba dedim, sen nasılsın? 🧱",
-            "Rüyamda seni gördüm, gerçek miydin? 😴",
-            "Kahve içerken evren hakkında düşünüyorum ☕",
-            "Dans pistinde görmüşümdür seni 🕺",
-            "Bulutlar bugün çok konuşkan 🗣️"
-        ];
+        const gifler = ['🎉', '❤️', '😍', '🤣', '👋', '🎵', '🌟', '💫', '🔥', '💯'];
 
-        function rastgeleProfil() {
-            const tip = deliTipleri[Math.floor(Math.random() * deliTipleri.length)];
-            const ad = takmaAdlar[Math.floor(Math.random() * takmaAdlar.length)];
-            const hakkinda = hakkindaCumleleri[Math.floor(Math.random() * hakkindaCumleleri.length)];
-            return {
-                id: Math.random().toString(36).substr(2, 9),
-                ad,
-                ...tip,
-                hakkinda,
-                yas: Math.floor(Math.random() * 30) + 20
-            };
+        const ilgiAlanlari = ['🎵 Müzik', '🎨 Sanat', '📚 Felsefe', '🚀 Uzay', '🍕 Yemek', '🌳 Doğa', '💻 Teknoloji', '🎬 Sinema'];
+
+        let currentUser = '';
+        let userProfile = null;
+        let profiles = [];
+        let currentProfileIndex = 0;
+        let matches = [];
+        let currentChat = null;
+        let likedProfiles = [];
+        let passedProfiles = [];
+        let darkMode = false;
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('sohbetDeliData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                currentUser = data.currentUser || '';
+                userProfile = data.userProfile || null;
+                matches = data.matches || [];
+                likedProfiles = data.likedProfiles || [];
+                passedProfiles = data.passedProfiles || [];
+                darkMode = data.darkMode || false;
+            }
         }
 
-        function App() {
-            const [sayfa, setSayfa] = useState('giris');
-            const [kullaniciAdi, setKullaniciAdi] = useState('');
-            const [aktifProfil, setAktifProfil] = useState(null);
-            const [eslesmeler, setEslesmeler] = useState([]);
-            const [aktifSohbet, setAktifSohbet] = useState(null);
-            const [mesajlar, setMesajlar] = useState([]);
-            const [yeniMesaj, setYeniMesaj] = useState('');
-            const [kaydirmaEfekt, setKaydirmaEfekt] = useState('');
-            const [tumSohbetler, setTumSohbetler] = useState({});
+        function saveToStorage() {
+            const data = { currentUser, userProfile, matches, likedProfiles, passedProfiles, darkMode };
+            localStorage.setItem('sohbetDeliData', JSON.stringify(data));
+        }
 
-            useEffect(() => {
-                if (sayfa === 'profiller' && !aktifProfil) {
-                    setAktifProfil(rastgeleProfil());
-                }
-            }, [sayfa, aktifProfil]);
-
-            useEffect(() => {
-                if (aktifSohbet) {
-                    const sohbetMesajlari = tumSohbetler[aktifSohbet.id] || [];
-                    setMesajlar(sohbetMesajlari);
-                }
-            }, [aktifSohbet, tumSohbetler]);
-
-            const girisYap = (e) => {
-                e.preventDefault();
-                if (kullaniciAdi.trim()) {
-                    setSayfa('profiller');
-                }
-            };
-
-            const profilIslem = (begenildi) => {
-                if (!aktifProfil) return;
-
-                setKaydirmaEfekt(begenildi ? 'swipe-right' : 'swipe-left');
-
-                setTimeout(() => {
-                    if (begenildi) {
-                        const eslesme = Math.random() > 0.3;
-                        if (eslesme) {
-                            setEslesmeler([...eslesmeler, aktifProfil]);
-                            alert(`🎉 Eşleşme! ${aktifProfil.ad} ile sohbet edebilirsin!`);
-                        }
-                    }
-                    setKaydirmaEfekt('');
-                    setAktifProfil(rastgeleProfil());
-                }, 300);
-            };
-
-            const sohbetAc = (profil) => {
-                setAktifSohbet(profil);
-                setSayfa('sohbet');
-            };
-
-            const mesajGonder = (e) => {
-                e.preventDefault();
-                if (!yeniMesaj.trim()) return;
-
-                const yeniMesajObj = {
-                    id: Date.now(),
-                    gonderen: 'ben',
-                    metin: yeniMesaj,
-                    zaman: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+        function generateProfiles() {
+            profiles = [];
+            for (let i = 0; i < 50; i++) {
+                const profile = {
+                    id: Date.now() + i,
+                    name: `Deli${Math.floor(Math.random() * 9999)}`,
+                    emoji: emojiler[Math.floor(Math.random() * emojiler.length)],
+                    type: deliTipleri[Math.floor(Math.random() * deliTipleri.length)],
+                    bio: bioOrnekleri[Math.floor(Math.random() * bioOrnekleri.length)],
+                    age: 18 + Math.floor(Math.random() * 30),
+                    distance: Math.floor(Math.random() * 50) + 1,
+                    interests: []
                 };
-
-                const guncelMesajlar = [...mesajlar, yeniMesajObj];
-                setMesajlar(guncelMesajlar);
-                setYeniMesaj('');
-
-                setTumSohbetler({
-                    ...tumSohbetler,
-                    [aktifSohbet.id]: guncelMesajlar
-                });
-
-                setTimeout(() => {
-                    const otomatikCevap = {
-                        id: Date.now() + 1,
-                        gonderen: 'karsi',
-                        metin: otomatikMesajlar[Math.floor(Math.random() * otomatikMesajlar.length)],
-                        zaman: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-                    };
-                    const cevapliMesajlar = [...guncelMesajlar, otomatikCevap];
-                    setMesajlar(cevapliMesajlar);
-                    setTumSohbetler({
-                        ...tumSohbetler,
-                        [aktifSohbet.id]: cevapliMesajlar
-                    });
-                }, 1000 + Math.random() * 2000);
-            };
-
-            const cikisYap = () => {
-                setKullaniciAdi('');
-                setEslesmeler([]);
-                setTumSohbetler({});
-                setSayfa('giris');
-            };
-
-            // SAYFA RENDER
-            if (sayfa === 'giris') {
-                return (
-                    <div className="min-h-screen flex items-center justify-center p-4">
-                        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
-                            <div className="text-center mb-8">
-                                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
-                                    SohbetEdecekDeliBul.com
-                                </h1>
-                                <p className="text-gray-600">🤪 Delilikle tanış, sohbetle eğlen! 💬</p>
-                            </div>
-                            <form onSubmit={girisYap} className="space-y-4">
-                                <div>
-                                    <label className="block text-gray-700 font-semibold mb-2">
-                                        Takma Adın
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={kullaniciAdi}
-                                        onChange={(e) => setKullaniciAdi(e.target.value)}
-                                        placeholder="Örneğin ÇılgınKedi"
-                                        className="w-full px-4 py-3 border-2 border-purple-300 rounded-xl focus:outline-none focus:border-purple-600"
-                                        required
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:from-purple-700 hover:to-pink-700 transition"
-                                >
-                                    Deliliklere Katıl! 🚀
-                                </button>
-                            </form>
-                            <p className="text-xs text-gray-500 text-center mt-6">
-                                ⚠️ Kişisel bilgi paylaşmayın, bu site eğlencelik bir simülasyondur
-                            </p>
-                        </div>
-                    </div>
-                );
+                
+                const numInterests = 3 + Math.floor(Math.random() * 3);
+                const shuffled = [...ilgiAlanlari].sort(() => 0.5 - Math.random());
+                profile.interests = shuffled.slice(0, numInterests);
+                
+                profiles.push(profile);
             }
-
-            if (sayfa === 'profiller') {
-                return (
-                    <div className="min-h-screen p-4">
-                        <div className="max-w-md mx-auto">
-                            <div className="bg-white rounded-t-3xl p-4 shadow-lg flex justify-between items-center">
-                                <h2 className="text-2xl font-bold text-purple-600">Deli Profilleri</h2>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setSayfa('eslesmeler')}
-                                        className="bg-pink-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-pink-600 transition"
-                                    >
-                                        💬 Eşleşmeler ({eslesmeler.length})
-                                    </button>
-                                    <button
-                                        onClick={cikisYap}
-                                        className="bg-gray-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-gray-600 transition"
-                                    >
-                                        Çıkış
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="relative mt-8" style={{ height: '500px' }}>
-                                {aktifProfil && (
-                                    <div className={`card-swipe absolute inset-0 ${kaydirmaEfekt}`}>
-                                        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden h-full">
-                                            <div className="bg-gradient-to-br from-purple-400 to-pink-400 h-64 flex items-center justify-center">
-                                                <span className="text-9xl">{aktifProfil.emoji}</span>
-                                            </div>
-                                            <div className="p-6">
-                                                <h3 className="text-3xl font-bold text-gray-800 mb-2">
-                                                    {aktifProfil.ad}, {aktifProfil.yas}
-                                                </h3>
-                                                <p className="text-lg text-purple-600 font-semibold mb-4">
-                                                    {aktifProfil.tip}
-                                                </p>
-                                                <p className="text-gray-600 italic">
-                                                    "{aktifProfil.hakkinda}"
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex justify-center gap-8 mt-8">
-                                <button
-                                    onClick={() => profilIslem(false)}
-                                    className="bg-red-500 hover:bg-red-600 text-white rounded-full w-20 h-20 flex items-center justify-center text-4xl shadow-lg transition transform hover:scale-110"
-                                >
-                                    ❌
-                                </button>
-                                <button
-                                    onClick={() => profilIslem(true)}
-                                    className="bg-green-500 hover:bg-green-600 text-white rounded-full w-20 h-20 flex items-center justify-center text-4xl shadow-lg transition transform hover:scale-110"
-                                >
-                                    ❤️
-                                </button>
-                            </div>
-
-                            <p className="text-white text-center mt-6 text-sm">
-                                ⚠️ Bu site tamamen eğlence amaçlıdır. Gerçek kişilerle değil, yapay profillerle etkileşimdesiniz.
-                            </p>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (sayfa === 'eslesmeler') {
-                return (
-                    <div className="min-h-screen p-4">
-                        <div className="max-w-2xl mx-auto">
-                            <div className="bg-white rounded-3xl p-6 shadow-lg">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-3xl font-bold text-purple-600">Eşleşmelerim</h2>
-                                    <button
-                                        onClick={() => setSayfa('profiller')}
-                                        className="bg-purple-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-600 transition"
-                                    >
-                                        ← Geri Dön
-                                    </button>
-                                </div>
-
-                                {eslesmeler.length === 0 ? (
-                                    <div className="text-center py-12">
-                                        <p className="text-2xl text-gray-400">😢 Henüz eşleşmen yok</p>
-                                        <p className="text-gray-500 mt-2">Hadi profillere dön ve deli bul!</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {eslesmeler.map((profil) => (
-                                            <div
-                                                key={profil.id}
-                                                onClick={() => sohbetAc(profil)}
-                                                className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-4 cursor-pointer hover:shadow-lg transition transform hover:scale-105"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <span className="text-6xl">{profil.emoji}</span>
-                                                    <div>
-                                                        <h3 className="text-xl font-bold text-gray-800">
-                                                            {profil.ad}
-                                                        </h3>
-                                                        <p className="text-purple-600 font-semibold">
-                                                            {profil.tip}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <p className="mt-3 text-sm text-gray-600 italic">
-                                                    "{profil.hakkinda}"
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (sayfa === 'sohbet' && aktifSohbet) {
-                return (
-                    <div className="min-h-screen p-4">
-                        <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col" style={{ height: '90vh' }}>
-                            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 flex items-center gap-4">
-                                <button
-                                    onClick={() => {
-                                        setSayfa('eslesmeler');
-                                        setAktifSohbet(null);
-                                    }}
-                                    className="text-white text-2xl"
-                                >
-                                    ←
-                                </button>
-                                <span className="text-4xl">{aktifSohbet.emoji}</span>
-                                <div>
-                                    <h3 className="text-xl font-bold text-white">{aktifSohbet.ad}</h3>
-                                    <p className="text-pink-200 text-sm">{aktifSohbet.tip}</p>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                                {mesajlar.length === 0 && (
-                                    <div className="text-center text-gray-400 mt-12">
-                                        <p className="text-xl">Sohbet başlasın! 💬</p>
-                                        <p className="text-sm mt-2">İlk mesajı sen at!</p>
-                                    </div>
-                                )}
-                                {mesajlar.map((mesaj) => (
-                                    <divkey={mesaj.id}
-                                        className={`flex ${mesaj.gonderen === 'ben' ? 'justify-end' : 'justify-start'}`}
-                                    >
-                                        <div
-                                            className={`max-w-xs px-4 py-2 rounded-2xl ${
-                                                mesaj.gonderen === 'ben'
-                                                    ? 'bg-purple-600 text-white'
-                                                    : 'bg-gray-200 text-gray-800'
-                                            }`}
-                                        >
-                                            <p>{mesaj.metin}</p>
-                                            <p className={`text-xs mt-1 ${
-                                                mesaj.gonderen === 'ben' ? 'text-purple-200' : 'text-gray-500'
-                                            }`}>
-                                                {mesaj.zaman}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <form onSubmit={mesajGonder} className="p-4 border-t-2 border-gray-200">
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={yeniMesaj}
-                                        onChange={(e) => setYeniMesaj(e.target.value)}
-                                        placeholder="Mesajını yaz..."
-                                        className="flex-1 px-4 py-3 border-2 border-purple-300 rounded-full focus:outline-none focus:border-purple-600"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition"
-                                    >
-                                        Gönder
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                );
-            }
-
-            return null;
         }
 
-        ReactDOM.render(<App />, document.getElementById('root'));
+        function renderLogin() {
+            return `
+                <div class="min-h-screen gradient-bg flex items-center justify-center p-4">
+                    <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full">
+                        <div class="text-center mb-8">
+                            <div class="text-8xl mb-6 float emoji-hover">🤪</div>
+                            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 mb-3">
+                                SohbetDeliBul
+                            </h1>
+                            <p class="text-gray-600 text-lg font-semibold">Deliler dünyasına hoş geldin!</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <input type="text" id="username" 
+                                class="w-full px-5 py-4 border-2 border-purple-300 rounded-2xl focus:outline-none focus:border-purple-600 transition text-lg"
+                                placeholder="Takma adını gir">
+                            
+                            <input type="number" id="userage" min="18" max="99"
+                                class="w-full px-5 py-4 border-2 border-purple-300 rounded-2xl focus:outline-none focus:border-purple-600 transition text-lg"
+                                placeholder="Yaşın">
+                            
+                            <select id="usertype" 
+                                class="w-full px-5 py-4 border-2 border-purple-300 rounded-2xl focus:outline-none focus:border-purple-600 transition text-lg">
+                                <option value="">Deli tipini seç</option>
+                                ${deliTipleri.map(t => `<option value="${t}">${t}</option>`).join('')}
+                            </select>
+
+                            <textarea id="userbio" 
+                                class="w-full px-5 py-4 border-2 border-purple-300 rounded-2xl focus:outline-none focus:border-purple-600 transition text-lg resize-none"
+                                placeholder="Hakkında..." rows="3"></textarea>
+                            
+                            <button onclick="login()" 
+                                class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 text-white font-bold py-5 rounded-2xl hover:shadow-2xl transition transform hover:scale-105 text-xl glow">
+                                Deli Dünyasına Gir 🚀
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-gray-500 text-center mt-8">
+                            ⚠️ Kişisel bilgi paylaşmayın, bu eğlencelik simülasyondur
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMain() {
+            if (profiles.length === 0 || currentProfileIndex >= profiles.length) {
+                return `
+                    <div class="min-h-screen gradient-bg flex items-center justify-center p-4">
+                        <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 max-w-md w-full text-center">
+                            <div class="text-8xl mb-6 shake">😱</div>
+                            <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">Profiller Bitti!</h2>
+                            <p class="text-gray-600 text-lg mb-8">Yeni profiller yükleniyor...</p>
+                            <button onclick="resetProfiles()" 
+                                class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-2xl hover:shadow-2xl transition transform hover:scale-105 font-bold text-lg">
+                                Yeni Profiller 🔄
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const profile = profiles[currentProfileIndex];
+            
+            return `
+                <div class="min-h-screen ${darkMode ? 'bg-gray-900' : 'gradient-bg'}">
+                    <header class="${darkMode ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-lg shadow-xl">
+                        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <h1 class="text-3xl font-black ${darkMode ? 'text-white' : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600'}">
+                                    🤪 SohbetDeliBul
+                                </h1>
+                                <button onclick="toggleDarkMode()" class="text-3xl hover:scale-125 transition emoji-hover">
+                                    ${darkMode ? '☀️' : '🌙'}
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <button onclick="showProfile()" class="hover:scale-110 transition">
+                                    <span class="text-4xl emoji-hover">${userProfile?.emoji || '👤'}</span>
+                                </button>
+                                <button onclick="showMatches()" class="relative hover:scale-110 transition">
+                                    <span class="text-4xl emoji-hover">💬</span>
+                                    ${matches.length > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center pulse">${matches.length}</span>` : ''}
+                                </button>
+                                <button onclick="showSettings()" class="text-3xl hover:scale-125 transition emoji-hover">⚙️</button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="flex items-center justify-center p-6 py-12">
+                        <div class="max-w-lg w-full">
+                            <div id="profileCard" class="card-swipe ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl overflow-hidden">
+                                <div class="relative h-96">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center">
+                                        <span class="text-9xl emoji-hover">${profile.emoji}</span>
+                                    </div>
+                                    <div class="absolute top-6 left-6 bg-white/90 px-4 py-2 rounded-full shadow-lg">
+                                        <span class="font-bold">📍 ${profile.distance} km</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-8">
+                                    <h2 class="text-4xl font-black ${darkMode ? 'text-white' : 'text-gray-900'} mb-2">${profile.name}, ${profile.age}</h2>
+                                    <p class="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text mb-4">${profile.type}</p>
+                                    <p class="${darkMode ? 'text-gray-300' : 'text-gray-700'} text-lg italic mb-6">"${profile.bio}"</p>
+                                    
+                                    <div class="flex flex-wrap gap-2">
+                                        ${profile.interests.map(i => `
+                                            <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-semibold">
+                                                ${i}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center gap-8 mt-10">
+                                <button onclick="swipe('left')" 
+                                    class="bg-red-500 hover:bg-red-600 text-white rounded-full w-20 h-20 flex items-center justify-center shadow-2xl transition btn-hover">
+                                    <span class="text-5xl">❌</span>
+                                </button>
+                                
+                                <button onclick="superLike()" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-24 h-24 flex items-center justify-center shadow-2xl transition btn-hover glow">
+                                    <span class="text-6xl">⭐</span>
+                                </button>
+                                
+                                <button onclick="swipe('right')" 
+                                    class="bg-green-500 hover:bg-green-600 text-white rounded-full w-20 h-20 flex items-center justify-center shadow-2xl transition btn-hover">
+                                    <span class="text-5xl">❤️</span>
+                                </button>
+                            </div>
+
+                            <div class="text-center mt-8">
+                                <p class="${darkMode ? 'text-gray-300' : 'text-white'} text-lg font-bold bg-black/20 px-6 py-3 rounded-full inline-block">
+                                    📊 Kalan: ${profiles.length - currentProfileIndex} | ❤️ ${likedProfiles.length}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fixed bottom-4 right-4">
+                        <button onclick="showEasterEgg()" 
+                            class="bg-yellow-400 hover:bg-yellow-500 text-4xl rounded-full w-20 h-20 shadow-lg transition float emoji-hover">
+                            🎈
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMatches() {
+            if (matches.length === 0) {
+                return `
+                    <div class="min-h-screen ${darkMode ? 'bg-gray-900' : 'gradient-bg'} flex items-center justify-center p-4">
+                        <div class="${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl p-12 max-w-md w-full text-center">
+                            <div class="text-8xl mb-6">💔</div>
+                            <h2 class="text-4xl font-black ${darkMode ? 'text-white' : 'text-purple-600'} mb-4">Henüz Eşleşme Yok</h2>
+                            <p class="${darkMode ? 'text-gray-300' : 'text-gray-700'} text-lg italic mb-4">"${userProfile.bio}"</p>
+                                <div class="flex flex-wrap gap-2">
+                                    ${userProfile.interests.map(i => `
+                                        <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-semibold">
+                                            ${i}
+                                        </span>
+                                    `).join('')}
+                                </div>
+
+                                <div class="mt-6 flex justify-between">
+                                    <button onclick="editProfile()" 
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded-2xl font-bold transition btn-hover">
+                                        Profili Düzenle
+                                    </button>
+                                    <button onclick="deleteProfile()" 
+                                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl font-bold transition btn-hover">
+                                        Hesabı Sil
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function login() {
+            const name = document.getElementById('username').value.trim();
+            const age = parseInt(document.getElementById('userage').value);
+            const type = document.getElementById('usertype').value;
+            const bio = document.getElementById('userbio').value.trim();
+
+            if (!name || !age || !type || !bio) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            userProfile = {
+                id: Date.now(),
+                name,
+                age,
+                type,
+                bio,
+                emoji: emojiler[Math.floor(Math.random() * emojiler.length)],
+                interests: ilgiAlanlari.sort(() => 0.5 - Math.random()).slice(0, 4)
+            };
+
+            currentUser = name;
+            saveToStorage();
+            generateProfiles();
+            currentProfileIndex = 0;
+            renderApp();
+        }
+
+        function swipe(direction) {
+            const profile = profiles[currentProfileIndex];
+            if (!profile) return;
+
+            if (direction === 'right') {
+                likedProfiles.push(profile);
+                if (!matches.some(m => m.id === profile.id)) {
+                    // rastgele eşleşme simülasyonu
+                    if (Math.random() < 0.5) {
+                        matches.push(profile);
+                    }
+                }
+            } else if (direction === 'left') {
+                passedProfiles.push(profile);
+            }
+
+            currentProfileIndex++;
+            saveToStorage();
+            renderApp();
+        }
+
+        function superLike() {
+            const profile = profiles[currentProfileIndex];
+            if (!profile) return;
+            likedProfiles.push(profile);
+            matches.push(profile);
+            currentProfileIndex++;
+            saveToStorage();
+            renderApp();
+        }
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            saveToStorage();
+            renderApp();
+        }
+
+        function showMatches() {
+            document.getElementById('app').innerHTML = renderMatches();
+        }
+
+        function showProfile() {
+            document.getElementById('app').innerHTML = renderProfile();
+        }
+
+        function backToMain() {
+            renderApp();
+        }
+
+        function resetProfiles() {
+            generateProfiles();
+            currentProfileIndex = 0;
+            renderApp();
+        }
+
+        function editProfile() {
+            alert('Profil düzenleme özelliği henüz simülasyon için kapalı.');
+        }
+
+        function deleteProfile() {
+            if (confirm('Hesabını silmek istediğine emin misin?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function showSettings() {
+            alert('Ayarlar simülasyon için kapalı.');
+        }
+
+        function openChat(id) {
+            currentChat = matches.find(m => m.id === id);
+            if (!currentChat.messages) currentChat.messages = [];
+            currentChat.isTyping = false;
+            renderApp();
+        }
+
+        function unmatch(id) {
+            matches = matches.filter(m => m.id !== id);
+            saveToStorage();
+            backToMain();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            currentChat.messages.push({ from: 'user', text, time });
+            input.value = '';
+            currentChat.isTyping = true;
+            renderApp();
+            saveToStorage();
+
+            // Simülasyon için cevap
+            setTimeout(() => {
+                const replyText = mesajSablonlari[Math.floor(Math.random() * mesajSablonlari.length)];
+                const replyTime = new Date();
+                const replyTimeStr = replyTime.getHours().toString().padStart(2, '0') + ':' + replyTime.getMinutes().toString().padStart(2, '0');
+
+                currentChat.messages.push({ from: 'bot', text: replyText, time: replyTimeStr });
+                currentChat.isTyping = false;
+                saveToStorage();
+                renderApp();
+            }, 1200 + Math.random() * 2000);
+        }
+
+        function sendGif() {
+            const input = document.getElementById('messageInput');
+            input.value += gifler[Math.floor(Math.random() * gifler.length)];
+            input.focus();
+        }
+
+        function showEasterEgg() {
+            alert('🎉 Gizli balon bulundu! 🎈');
+        }
+
+        function renderApp() {
+            if (!currentUser || !userProfile) {
+                document.getElementById('app').innerHTML = renderLogin();
+            } else if (currentChat) {
+                document.getElementById('app').innerHTML = renderChat();
+                const chatContainer = document.getElementById('chatMessages');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } else if (matches.length && Math.random() < 0.05) {
+                // küçük sürpriz
+                showEasterEgg();
+                document.getElementById('app').innerHTML = renderMain();
+            } else {
+                document.getElementById('app').innerHTML = renderMain();
+            }
+        }
+
+        loadFromStorage();
+        renderApp();
     </script>
 </body>
 </html>

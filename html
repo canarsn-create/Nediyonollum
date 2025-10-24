@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SohbetEdecekDeliBul.com - Deli Arkadaş Bul!</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        .card-swipe {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .card-swipe.swipe-left {
+            transform: translateX(-150%) rotate(-30deg);
+            opacity: 0;
+        }
+        .card-swipe.swipe-right {
+            transform: translateX(150%) rotate(30deg);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const deliTipleri = [
+            { tip: "Romantik Deli", emoji: "💕" },
+            { tip: "Felsefi Deli", emoji: "🤔" },
+            { tip: "Esprili Deli", emoji: "😂" },
+            { tip: "Sakin Deli", emoji: "😌" },
+            { tip: "Enerjik Deli", emoji: "⚡" },
+            { tip: "Şarkıcı Deli", emoji: "🎤" },
+            { tip: "Dans Eden Deli", emoji: "💃" },
+            { tip: "Yemek Delisi", emoji: "🍕" },
+            { tip: "Gece Kuşu Deli", emoji: "🦉" },
+            { tip: "Kahve Bağımlısı Deli", emoji: "☕" }
+        ];
+
+        const takmaAdlar = [
+            "DeliKralı", "PsikozPrenses", "ÇılgınKaplan", "UçukKedi", 
+            "MistikMaymun", "KaosPandası", "DelirtenDelfin", "SersemSinek",
+            "TuhafTilki", "GaripGoril", "AbsürtArı", "BilinmezBalina",
+            "EfsaneFil", "HayalciHamsi", "İllüzyonİnek", "JokerJaguar"
+        ];
+
+        const hakkindaCumleleri = [
+            "Gece 3'te tostla sohbet ederim, sen de gelir misin?",
+            "Hayat bir simulasyon ama ben gerçekten deliyim.",
+            "Kedime felsefe dersi veriyorum, ilgilendin mi?",
+            "Rüyamda makarna yedim, seninle de yesek?",
+            "Duvarla konuşuyorum ama o cevap vermiyor, sen ver.",
+            "Ayakkabılarımla dans ediyorum, partnerlik yapar mısın?",
+            "Süpermarkette opera söylüyorum, korom olur musun?",
+            "Bulutlara isim veriyorum, seninle paylaşırım.",
+            "Gölgemle tartışıyorum, hakem olur musun?",
+            "Zamanda yolculuk yapıyorum ama bilet pahalı, sen ver."
+        ];
+
+        const otomatikMesajlar = [
+            "Ben de tostla konuşurum! 🍞",
+            "Senin deli tipin nedir acaba? 🤪",
+            "Bugün bir kedi gördüm, filozoftu sanırım 🐱",
+            "Hava yağmurlu ama ruhum güneşli ☀️",
+            "Makarna felsefesi üzerine tez yazıyorum 🍝",
+            "Kafam karışık ama kalbim net 💗",
+            "Dans edelim mi, yoksa uçalım mı? 💫",
+            "Seni bulut gibi görüyorum, yumuşacık ☁️",
+            "Hayat kısa, deliliği uzat! 🎉",
+            "Seninle konuşmak terapi gibi 🌟",
+            "Bugün duvara merhaba dedim, sen nasılsın? 🧱",
+            "Rüyamda seni gördüm, gerçek miydin? 😴",
+            "Kahve içerken evren hakkında düşünüyorum ☕",
+            "Dans pistinde görmüşümdür seni 🕺",
+            "Bulutlar bugün çok konuşkan 🗣️"
+        ];
+
+        function rastgeleProfil() {
+            const tip = deliTipleri[Math.floor(Math.random() * deliTipleri.length)];
+            const ad = takmaAdlar[Math.floor(Math.random() * takmaAdlar.length)];
+            const hakkinda = hakkindaCumleleri[Math.floor(Math.random() * hakkindaCumleleri.length)];
+            return {
+                id: Math.random().toString(36).substr(2, 9),
+                ad,
+                ...tip,
+                hakkinda,
+                yas: Math.floor(Math.random() * 30) + 20
+            };
+        }
+
+        function App() {
+            const [sayfa, setSayfa] = useState('giris');
+            const [kullaniciAdi, setKullaniciAdi] = useState('');
+            const [aktifProfil, setAktifProfil] = useState(null);
+            const [eslesmeler, setEslesmeler] = useState([]);
+            const [aktifSohbet, setAktifSohbet] = useState(null);
+            const [mesajlar, setMesajlar] = useState([]);
+            const [yeniMesaj, setYeniMesaj] = useState('');
+            const [kaydirmaEfekt, setKaydirmaEfekt] = useState('');
+            const [tumSohbetler, setTumSohbetler] = useState({});
+
+            useEffect(() => {
+                if (sayfa === 'profiller' && !aktifProfil) {
+                    setAktifProfil(rastgeleProfil());
+                }
+            }, [sayfa, aktifProfil]);
+
+            useEffect(() => {
+                if (aktifSohbet) {
+                    const sohbetMesajlari = tumSohbetler[aktifSohbet.id] || [];
+                    setMesajlar(sohbetMesajlari);
+                }
+            }, [aktifSohbet, tumSohbetler]);
+
+            const girisYap = (e) => {
+                e.preventDefault();
+                if (kullaniciAdi.trim()) {
+                    setSayfa('profiller');
+                }
+            };
+
+            const profilIslem = (begenildi) => {
+                if (!aktifProfil) return;
+
+                setKaydirmaEfekt(begenildi ? 'swipe-right' : 'swipe-left');
+
+                setTimeout(() => {
+                    if (begenildi) {
+                        const eslesme = Math.random() > 0.3;
+                        if (eslesme) {
+                            setEslesmeler([...eslesmeler, aktifProfil]);
+                            alert(`🎉 Eşleşme! ${aktifProfil.ad} ile sohbet edebilirsin!`);
+                        }
+                    }
+                    setKaydirmaEfekt('');
+                    setAktifProfil(rastgeleProfil());
+                }, 300);
+            };
+
+            const sohbetAc = (profil) => {
+                setAktifSohbet(profil);
+                setSayfa('sohbet');
+            };
+
+            const mesajGonder = (e) => {
+                e.preventDefault();
+                if (!yeniMesaj.trim()) return;
+
+                const yeniMesajObj = {
+                    id: Date.now(),
+                    gonderen: 'ben',
+                    metin: yeniMesaj,
+                    zaman: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                const guncelMesajlar = [...mesajlar, yeniMesajObj];
+                setMesajlar(guncelMesajlar);
+                setYeniMesaj('');
+
+                setTumSohbetler({
+                    ...tumSohbetler,
+                    [aktifSohbet.id]: guncelMesajlar
+                });
+
+                setTimeout(() => {
+                    const otomatikCevap = {
+                        id: Date.now() + 1,
+                        gonderen: 'karsi',
+                        metin: otomatikMesajlar[Math.floor(Math.random() * otomatikMesajlar.length)],
+                        zaman: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+                    };
+                    const cevapliMesajlar = [...guncelMesajlar, otomatikCevap];
+                    setMesajlar(cevapliMesajlar);
+                    setTumSohbetler({
+                        ...tumSohbetler,
+                        [aktifSohbet.id]: cevapliMesajlar
+                    });
+                }, 1000 + Math.random() * 2000);
+            };
+
+            const cikisYap = () => {
+                setKullaniciAdi('');
+                setEslesmeler([]);
+                setTumSohbetler({});
+                setSayfa('giris');
+            };
+
+            // SAYFA RENDER
+            if (sayfa === 'giris') {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+                            <div className="text-center mb-8">
+                                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
+                                    SohbetEdecekDeliBul.com
+                                </h1>
+                                <p className="text-gray-600">🤪 Delilikle tanış, sohbetle eğlen! 💬</p>
+                            </div>
+                            <form onSubmit={girisYap} className="space-y-4">
+                                <div>
+                                    <label className="block text-gray-700 font-semibold mb-2">
+                                        Takma Adın
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={kullaniciAdi}
+                                        onChange={(e) => setKullaniciAdi(e.target.value)}
+                                        placeholder="Örneğin ÇılgınKedi"
+                                        className="w-full px-4 py-3 border-2 border-purple-300 rounded-xl focus:outline-none focus:border-purple-600"
+                                        required
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:from-purple-700 hover:to-pink-700 transition"
+                                >
+                                    Deliliklere Katıl! 🚀
+                                </button>
+                            </form>
+                            <p className="text-xs text-gray-500 text-center mt-6">
+                                ⚠️ Kişisel bilgi paylaşmayın, bu site eğlencelik bir simülasyondur
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (sayfa === 'profiller') {
+                return (
+                    <div className="min-h-screen p-4">
+                        <div className="max-w-md mx-auto">
+                            <div className="bg-white rounded-t-3xl p-4 shadow-lg flex justify-between items-center">
+                                <h2 className="text-2xl font-bold text-purple-600">Deli Profilleri</h2>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setSayfa('eslesmeler')}
+                                        className="bg-pink-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-pink-600 transition"
+                                    >
+                                        💬 Eşleşmeler ({eslesmeler.length})
+                                    </button>
+                                    <button
+                                        onClick={cikisYap}
+                                        className="bg-gray-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-gray-600 transition"
+                                    >
+                                        Çıkış
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="relative mt-8" style={{ height: '500px' }}>
+                                {aktifProfil && (
+                                    <div className={`card-swipe absolute inset-0 ${kaydirmaEfekt}`}>
+                                        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden h-full">
+                                            <div className="bg-gradient-to-br from-purple-400 to-pink-400 h-64 flex items-center justify-center">
+                                                <span className="text-9xl">{aktifProfil.emoji}</span>
+                                            </div>
+                                            <div className="p-6">
+                                                <h3 className="text-3xl font-bold text-gray-800 mb-2">
+                                                    {aktifProfil.ad}, {aktifProfil.yas}
+                                                </h3>
+                                                <p className="text-lg text-purple-600 font-semibold mb-4">
+                                                    {aktifProfil.tip}
+                                                </p>
+                                                <p className="text-gray-600 italic">
+                                                    "{aktifProfil.hakkinda}"
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-center gap-8 mt-8">
+                                <button
+                                    onClick={() => profilIslem(false)}
+                                    className="bg-red-500 hover:bg-red-600 text-white rounded-full w-20 h-20 flex items-center justify-center text-4xl shadow-lg transition transform hover:scale-110"
+                                >
+                                    ❌
+                                </button>
+                                <button
+                                    onClick={() => profilIslem(true)}
+                                    className="bg-green-500 hover:bg-green-600 text-white rounded-full w-20 h-20 flex items-center justify-center text-4xl shadow-lg transition transform hover:scale-110"
+                                >
+                                    ❤️
+                                </button>
+                            </div>
+
+                            <p className="text-white text-center mt-6 text-sm">
+                                ⚠️ Bu site tamamen eğlence amaçlıdır. Gerçek kişilerle değil, yapay profillerle etkileşimdesiniz.
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (sayfa === 'eslesmeler') {
+                return (
+                    <div className="min-h-screen p-4">
+                        <div className="max-w-2xl mx-auto">
+                            <div className="bg-white rounded-3xl p-6 shadow-lg">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-3xl font-bold text-purple-600">Eşleşmelerim</h2>
+                                    <button
+                                        onClick={() => setSayfa('profiller')}
+                                        className="bg-purple-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-600 transition"
+                                    >
+                                        ← Geri Dön
+                                    </button>
+                                </div>
+
+                                {eslesmeler.length === 0 ? (
+                                    <div className="text-center py-12">
+                                        <p className="text-2xl text-gray-400">😢 Henüz eşleşmen yok</p>
+                                        <p className="text-gray-500 mt-2">Hadi profillere dön ve deli bul!</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {eslesmeler.map((profil) => (
+                                            <div
+                                                key={profil.id}
+                                                onClick={() => sohbetAc(profil)}
+                                                className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-4 cursor-pointer hover:shadow-lg transition transform hover:scale-105"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <span className="text-6xl">{profil.emoji}</span>
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-gray-800">
+                                                            {profil.ad}
+                                                        </h3>
+                                                        <p className="text-purple-600 font-semibold">
+                                                            {profil.tip}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <p className="mt-3 text-sm text-gray-600 italic">
+                                                    "{profil.hakkinda}"
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (sayfa === 'sohbet' && aktifSohbet) {
+                return (
+                    <div className="min-h-screen p-4">
+                        <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col" style={{ height: '90vh' }}>
+                            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 flex items-center gap-4">
+                                <button
+                                    onClick={() => {
+                                        setSayfa('eslesmeler');
+                                        setAktifSohbet(null);
+                                    }}
+                                    className="text-white text-2xl"
+                                >
+                                    ←
+                                </button>
+                                <span className="text-4xl">{aktifSohbet.emoji}</span>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">{aktifSohbet.ad}</h3>
+                                    <p className="text-pink-200 text-sm">{aktifSohbet.tip}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                                {mesajlar.length === 0 && (
+                                    <div className="text-center text-gray-400 mt-12">
+                                        <p className="text-xl">Sohbet başlasın! 💬</p>
+                                        <p className="text-sm mt-2">İlk mesajı sen at!</p>
+                                    </div>
+                                )}
+                                {mesajlar.map((mesaj) => (
+                                    <divkey={mesaj.id}
+                                        className={`flex ${mesaj.gonderen === 'ben' ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        <div
+                                            className={`max-w-xs px-4 py-2 rounded-2xl ${
+                                                mesaj.gonderen === 'ben'
+                                                    ? 'bg-purple-600 text-white'
+                                                    : 'bg-gray-200 text-gray-800'
+                                            }`}
+                                        >
+                                            <p>{mesaj.metin}</p>
+                                            <p className={`text-xs mt-1 ${
+                                                mesaj.gonderen === 'ben' ? 'text-purple-200' : 'text-gray-500'
+                                            }`}>
+                                                {mesaj.zaman}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <form onSubmit={mesajGonder} className="p-4 border-t-2 border-gray-200">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={yeniMesaj}
+                                        onChange={(e) => setYeniMesaj(e.target.value)}
+                                        placeholder="Mesajını yaz..."
+                                        className="flex-1 px-4 py-3 border-2 border-purple-300 rounded-full focus:outline-none focus:border-purple-600"
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition"
+                                    >
+                                        Gönder
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                );
+            }
+
+            return null;
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
